@@ -37,14 +37,14 @@ def must_finish(bprogram):
     return [x.get('must_finish', False) for x in bprogram.tickets]
 
 
-def qlearning(bprogram, num_episodes, alpha, gamma, testing, seed, glie, episode_timeout=None):
+def qlearning(bprogram_generator, num_episodes, alpha, gamma, testing, seed, glie, episode_timeout=None):
     random.seed(seed)
     Q = dict()
     test_results = []
     tested_episodes = []
     mean_reward = []
     for i in range(num_episodes):
-        bprogram
+        bprogram = bprogram_generator()
         done = False
         bprogram.setup()
         steps_counter = 0
@@ -91,7 +91,7 @@ def qlearning(bprogram, num_episodes, alpha, gamma, testing, seed, glie, episode
     return Q, test_results, tested_episodes, mean_reward
 
 
-def run(bprogram, Q, seed):
+def run(bprogram, Q, seed, episode_timeout):
     random.seed(seed)
     done = False
     bprogram.setup()
@@ -114,6 +114,7 @@ def run(bprogram, Q, seed):
     else:
         a_t = bprogram.next_event()
     run += a_t.name
+    steps_counter = 0
     while True:
         bprogram.advance_bthreads(a_t)
         s_t_1 = "_".join([str(x.get('state', 'D')) for x in bprogram.tickets])
@@ -144,14 +145,19 @@ def run(bprogram, Q, seed):
             a_t_1 = bprogram.next_event()
         s_t, a_t, hot_states = s_t_1, a_t_1, hot_states_1   
         run += a_t.name
+        if steps_counter == episode_timeout:
+            break
+        steps_counter += 1
     return reward_sum, run
 
 
-def Q_test(bprogram, Q, rounds, seed):
+def Q_test(bprogram_generator, Q, rounds, seed, episode_timeout):
     total_reward = 0
     success = 0
     for i in range(rounds):
-        r, s = run(bprogram, Q, seed+i)
+        print(i)
+        bprogram = bprogram_generator()
+        r, s = run(bprogram, Q, seed+i, episode_timeout)
         total_reward += r
         if r==0:
             success += 1
@@ -159,7 +165,7 @@ def Q_test(bprogram, Q, rounds, seed):
     return total_reward/rounds
 
 
-def run_optimal(bprogram, Q, seed):
+def run_optimal(bprogram, Q, seed, episode_timeout):
     random.seed(seed)
     done = False
     bprogram.setup()
@@ -182,6 +188,7 @@ def run_optimal(bprogram, Q, seed):
     else:
         a_t = bprogram.next_event()
     run += a_t.name
+    steps_counter = 0
     while True:
         bprogram.advance_bthreads(a_t)
         s_t_1 = "_".join([str(x.get('state', 'D')) for x in bprogram.tickets])
@@ -212,14 +219,18 @@ def run_optimal(bprogram, Q, seed):
             a_t_1 = bprogram.next_event()
         s_t, a_t, hot_states = s_t_1, a_t_1, hot_states_1
         run += a_t.name
+        if steps_counter == episode_timeout:
+            break
+        steps_counter += 1
     return reward_sum, run
 
 
-def Q_test_optimal(bprogram, Q, rounds, seed):
+def Q_test_optimal(bprogram_generator, Q, rounds, seed, episode_timeout):
     total_reward = 0
     success = 0
     for i in range(rounds):
-        r, s = run_optimal(bprogram, Q, seed+i)
+        bprogram = bprogram_generator()
+        r, s = run_optimal(bprogram, Q, seed+i, episode_timeout)
         total_reward += r
         if r==0:
             success += 1

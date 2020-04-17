@@ -2,6 +2,8 @@ from bppy import *
 import itertools
 from q_learning import *
 import matplotlib.pyplot as plt
+import pygame
+import time
 
 
 must_finish = "must_finish"
@@ -48,12 +50,12 @@ def find_adjacent_objects(list_1, list_2):
     return [(l1, l2) for l1 in list_1 for l2 in list_2 if is_adjacent(l1, l2)]
 
 
-def block_action(event, neighbors_list):
-    neighbors_list = neighbors_list["neighbors_list"]
-    p1 = event_to_new_location(event)
-    p2 = event_to_2_steps_trajectory(event)
-    return (p1, p2) in neighbors_list or (p2, p1) in neighbors_list
-
+def block_action(neighbors_list):
+    def predicate(event):
+        p1 = event_to_new_location(event)
+        p2 = event_to_2_steps_trajectory(event)
+        return (p1, p2) in neighbors_list or (p2, p1) in neighbors_list
+    return predicate
 
 @b_thread
 def player(i, j):
@@ -62,21 +64,22 @@ def player(i, j):
         e = yield {request: [BEvent(d, {"i": i, "j": j}) for d in directions], state: str(i)+"_"+str(j)}
         i, j = event_to_new_location(e)
 
-
 @b_thread
-def wall(walls_list):
+def wall():
+    global walls_list
     block_list = list(itertools.chain(*[new_location_to_events(i, j) for i, j in walls_list]))  # use event_to_new_location(e)
     yield {block: block_list}
 
-
 @b_thread
-def box(box_list, walls_list):  # walls list should be global const
+def boxes():
+    global box_list, walls_list, target_list
     while True:
         neighbors_list = find_adjacent_objects(box_list, walls_list) + \
                          find_adjacent_objects(box_list, box_list)
-        double_object_movement = EventSet(block_action, neighbors_list=neighbors_list)
+        double_object_movement = EventSet(block_action(neighbors_list))
         box_list_state = "_".join([str(i) for b in box_list for i in b])
-        e = yield {block: double_object_movement, waitFor: All(), state: box_list_state}
+        all_targets_full = sorted(box_list) == sorted(target_list)
+        e = yield {block: double_object_movement, waitFor: All(), state: box_list_state, must_finish: not all_targets_full}
         new_player_location = event_to_new_location(e)
         if new_player_location in box_list:
             new_box_location = event_to_2_steps_trajectory(e)
@@ -84,113 +87,164 @@ def box(box_list, walls_list):  # walls list should be global const
             box_list.append(new_box_location)
 
 
-# def block_action(n_list): change to gera's option
-#     def predicate():
-#           pass
-#     return predicate
-#
-
-
-@b_thread
-def target(i, j, full):
-    e = yield {waitFor: All(), state: 1}
-    while True:
-        new_player_location = event_to_new_location(e)
-        if new_player_location == (i, j):
-            full = false
-        elif new_player_location in box_list:
-            new_box_location = event_to_2_steps_trajectory(e)
-            if (i, j) == new_box_location:
-                full = true
-        if full:
-            e = yield {block: All(), must_finish: not full}
-        else:
-            e = yield {waitFor: All(), must_finish: not full, state: 2}
-
-
 @b_thread
 def map_printer(map):
-    while True:
-        #print("\n".join(map))
-        #print()
-        e = yield {waitFor: All()}
-        map = ",".join(map).replace("a", " ").split(",")
-        map = ",".join(map).replace("A", "t").split(",")
-        i, j = event_to_new_location(e)
-        if map[i][j] == "b" or map[i][j] == "B":
-            i2, j2 = event_to_2_steps_trajectory(e)
-            if map[i2][j2] == "t":
-                map[i2] = map[i2][:j2] + "B" + map[i2][j2 + 1:]
-            else:
-                map[i2] = map[i2][:j2] + "b" + map[i2][j2 + 1:]
-            if map[i][j] == "b":
-                map[i] = map[i][:j] + "a" + map[i][j+1:]
-            else:
+    if display:
+
+        main_surface = pygame.display.set_mode((32 * len(map[0]), 32 * len(map)))
+        while True:
+            # Look for an event from keyboard, mouse, joystick, etc.
+            ev = pygame.event.poll()
+            if ev.type == pygame.QUIT:  # Window close button clicked?
+                break
+            # Completely redraw the surface, starting with background
+            main_surface.fill((255, 255, 255))
+            for i in range(len(map)):
+                for j in range(len(map[i])):
+                    # Copy our image to the surface, at this (x,y) posn
+                    main_surface.blit(map_dict[map[i][j]], (j * 32, i * 32))
+            # Now that everything is drawn, put it on display!
+            pygame.display.flip()
+            time.sleep(0.5)
+
+            e = yield {waitFor: All()}
+
+            map = ",".join(map).replace("a", " ").split(",")
+            map = ",".join(map).replace("A", "t").split(",")
+            i, j = event_to_new_location(e)
+            if map[i][j] == "b" or map[i][j] == "B":
+                i2, j2 = event_to_2_steps_trajectory(e)
+                if map[i2][j2] == "t":
+                    map[i2] = map[i2][:j2] + "B" + map[i2][j2 + 1:]
+                else:
+                    map[i2] = map[i2][:j2] + "b" + map[i2][j2 + 1:]
+                if map[i][j] == "b":
+                    map[i] = map[i][:j] + "a" + map[i][j+1:]
+                else:
+                    map[i] = map[i][:j] + "A" + map[i][j + 1:]
+            elif map[i][j] == "t":
                 map[i] = map[i][:j] + "A" + map[i][j + 1:]
-        elif map[i][j] == "t":
-            map[i] = map[i][:j] + "A" + map[i][j + 1:]
-        else:
-            map[i] = map[i][:j] + "a" + map[i][j + 1:]
+            else:
+                map[i] = map[i][:j] + "a" + map[i][j + 1:]
+    else:
+        yield {waitFor: All()}
 
 
 # run
 def find(map, ch):
     return [(i, j) for i, row in enumerate(map) for j, c in enumerate(row) if c == ch]
 
+
+walls_list = []
+box_list = []
+target_list = []
+display = False
+
+# map = [
+#     "  XXXXX ",
+#     "XXX   X ",
+#     "X b X XX",
+#     "X X  t X",
+#     "X    X X",
+#     "XX X   X",
+#     " Xa  XXX",
+#     " XXXXX  "
+# ]
+#
 map = [
-    "  XXXXX ",
-    "XXX   X ",
-    "X b X XX",
-    "X X  t X",
-    "X    X X",
-    "XX X   X",
-    " Xa  XXX",
-    " XXXXX  "
-]
+    "XXXXXXXXX",
+    "Xa      X",
+    "X  b X  X",
+    "X  XXX  X",
+    "X      tX",
+    "XXXXXXXXX"
+       ]
 
 # map = [
 #     "XXXXXX",
-#     "Xa   X",
-#     "X   bX",
-#     "X   tX",
+#     "Xab tX",
 #     "XXXXXX"
 #        ]
 
+# map = [
+#     " XXXXX   ",
+#     " X   XXXX",
+#     " X   X  X",
+#     " XX    tX",
+#     "XXX XXXtX",
+#     "X b X XtX",
+#     "X bbX XXX",
+#     "Xa  X    ",
+#     "XXXXX    ",
+# ]
+
+# map = [
+#     " XXXXX   ",
+#     " X   XXXX",
+#     " X  tX  X",
+#     " XX  X  X",
+#     "XXX XXX X",
+#     "X   X X X",
+#     "X  bX XXX",
+#     "Xa  X    ",
+#     "XXXXX    ",
+# ]
+
+
+map_dict = {
+    " ": pygame.transform.scale(pygame.image.load("sokoban_pygame/floor.png"), (32,32)),
+    "X": pygame.transform.scale(pygame.image.load("sokoban_pygame/wall.png"), (32,32)),
+    "b": pygame.transform.scale(pygame.image.load("sokoban_pygame/box.png"), (32,32)),
+    "B": pygame.transform.scale(pygame.image.load("sokoban_pygame/box_on_target.png"), (32,32)),
+    "a": pygame.transform.scale(pygame.image.load("sokoban_pygame/player.png"), (32,32)),
+    "A": pygame.transform.scale(pygame.image.load("sokoban_pygame/player_on_target.png"), (32,32)),
+    "t": pygame.transform.scale(pygame.image.load("sokoban_pygame/box_target.png"), (32,32))
+}
+
 
 def init_bprogram():
+    global walls_list, box_list, target_list
     walls_list = find(map, "X")
     box_list = find(map, "b") + find(map, "B")
     empty_target_list = find(map, "t") + find(map, "A")
     full_target_list = find(map, "B")
+    target_list = empty_target_list + full_target_list
     player_locations = find(map, "a") + find(map, "A")
+    player_location = player_locations[0]
 
-    bthreads_list = [player(*l) for l in player_locations] + \
-                    [target(*l, false) for l in empty_target_list] + \
-                    [target(*l, true) for l in full_target_list] + \
-                    [wall(walls_list), box(box_list, walls_list), map_printer(map)]
-    return BProgram(bthreads=bthreads_list,
-                     event_selection_strategy=SimpleEventSelectionStrategy())
+    bthreads_list = [player(*player_location), wall(), boxes(), map_printer(map)]
+    return BProgram(bthreads=bthreads_list, event_selection_strategy=SimpleEventSelectionStrategy())
 
 
-Q, results, episodes, mean_reward = qlearning(init_bprogram=init_bprogram,
-                                              num_episodes=100000,
-                                              episode_timeout=100,
-                                              alpha=0.1,
-                                              gamma=0.99,
-                                              testing=True,
-                                              seed=1,
-                                              glie=glie_10)
-plt.plot(episodes, mean_reward)
-plt.ylabel('mean reward')
-plt.xlabel('episode')
-plt.title(os.path.basename(sys.argv[0])[:-3])
-plt.savefig(os.path.basename(sys.argv[0])[:-3] + ".pdf")
-# event_runs = []
-# for i in range(100):
-#     reward, event_run = run_optimal(b_program, Q, i)
-#     if event_run not in event_runs:
-#         event_runs.append(event_run)
-# print(event_runs)
-print(Q_test_optimal(b_program, Q, 1000, 2))
+# Q, results, episodes, mean_reward = qlearning(bprogram_generator=init_bprogram,
+#                                               num_episodes=10000,
+#                                               episode_timeout=150,
+#                                               alpha=0.1,
+#                                               gamma=0.99,
+#                                               testing=True,
+#                                               seed=1,
+#                                               glie=glie_10)
+# plt.plot(episodes, mean_reward)
+# plt.ylabel('mean reward')
+# plt.xlabel('episode')
+# plt.title(os.path.basename(sys.argv[0])[:-3])
+# plt.savefig(os.path.basename(sys.argv[0])[:-3] + ".pdf")
+# # event_runs = []
+# # for i in range(100):
+# #     reward, event_run = run_optimal(b_program, Q, i)
+# #     if event_run not in event_runs:
+# #         event_runs.append(event_run)
+# # print(event_runs)
+# import pickle
+# pickle_out = open("Q.pickle", "wb")
+# pickle.dump(Q, pickle_out)
+# pickle_out.close()
+import pickle
+pickle_in = open("Q.pickle", "rb")
+Q = pickle.load(pickle_in)
+pickle_in.close()
 
-
+display = True
+pygame.init()  # Prepare the PyGame module for use
+print(Q_test_optimal(init_bprogram, Q, 1, 2, 80))
+pygame.quit()
