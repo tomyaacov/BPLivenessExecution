@@ -49,6 +49,9 @@ def is_adjacent(l1, l2):
 def find_adjacent_objects(list_1, list_2):
     return [(l1, l2) for l1 in list_1 for l2 in list_2 if is_adjacent(l1, l2)]
 
+def find_adjacent_boxes(location, l):
+    return [(location, l2) for l2 in l if is_adjacent(location, l2)]
+
 
 def block_action(neighbors_list):
     def predicate(event):
@@ -56,6 +59,7 @@ def block_action(neighbors_list):
         p2 = event_to_2_steps_trajectory(event)
         return (p1, p2) in neighbors_list or (p2, p1) in neighbors_list
     return predicate
+
 
 @b_thread
 def player(i, j):
@@ -86,12 +90,31 @@ def boxes():
             box_list.remove(new_player_location)
             box_list.append(new_box_location)
 
+@b_thread
+def box(i, j):
+    global box_list, walls_list, target_list
+    while True:
+        neighbors_list = find_adjacent_boxes((i, j), walls_list) + \
+                         find_adjacent_boxes((i, j), box_list)
+        double_object_movement = EventSet(block_action(neighbors_list))
+        box_state = str(i) + "_" + str(j)
+        box_in_target = (i, j) in target_list
+        e = yield {block: double_object_movement, waitFor: All(), state: box_state,
+                   must_finish: not box_in_target}
+        new_player_location = event_to_new_location(e)
+        if new_player_location == (i, j):
+            new_box_location = event_to_2_steps_trajectory(e)
+            box_list.remove(new_player_location)
+            box_list.append(new_box_location)
+            i, j = new_box_location
+
 
 @b_thread
 def map_printer(map):
     if display:
 
         main_surface = pygame.display.set_mode((32 * len(map[0]), 32 * len(map)))
+        count = 0
         while True:
             # Look for an event from keyboard, mouse, joystick, etc.
             ev = pygame.event.poll()
@@ -106,6 +129,8 @@ def map_printer(map):
             # Now that everything is drawn, put it on display!
             pygame.display.flip()
             time.sleep(0.5)
+            #print(count)
+            count += 1
 
             e = yield {waitFor: All()}
 
@@ -151,6 +176,7 @@ display = False
 #     " XXXXX  "
 # ]
 #
+# Q_a
 map = [
     "XXXXXXXXX",
     "Xa      X",
@@ -161,11 +187,17 @@ map = [
        ]
 
 # map = [
-#     "XXXXXX",
-#     "Xab tX",
-#     "XXXXXX"
+#     "XXXXXXXXXX",
+#     "X tba b tX",
+#     "XXXXXXXXXX"
 #        ]
 
+#
+# map = [
+#     "XXXXX",
+#     "XabtX",
+#     "XXXXX"
+#        ]
 # map = [
 #     " XXXXX   ",
 #     " X   XXXX",
@@ -177,12 +209,12 @@ map = [
 #     "Xa  X    ",
 #     "XXXXX    ",
 # ]
-
+# Q_b
 # map = [
 #     " XXXXX   ",
 #     " X   XXXX",
-#     " X  tX  X",
-#     " XX  X  X",
+#     " X   X  X",
+#     " XX    tX",
 #     "XXX XXX X",
 #     "X   X X X",
 #     "X  bX XXX",
@@ -212,16 +244,19 @@ def init_bprogram():
     player_locations = find(map, "a") + find(map, "A")
     player_location = player_locations[0]
 
-    bthreads_list = [player(*player_location), wall(), boxes(), map_printer(map)]
+    bthreads_list = [player(*player_location), wall(), map_printer(map)] + [box(*l) for l in box_list]
     return BProgram(bthreads=bthreads_list, event_selection_strategy=SimpleEventSelectionStrategy())
 
 
+
+
+
 # Q, results, episodes, mean_reward = qlearning(bprogram_generator=init_bprogram,
-#                                               num_episodes=10000,
-#                                               episode_timeout=150,
+#                                               num_episodes=1000000,
+#                                               episode_timeout=300,
 #                                               alpha=0.1,
 #                                               gamma=0.99,
-#                                               testing=True,
+#                                               testing=True,`
 #                                               seed=1,
 #                                               glie=glie_10)
 # plt.plot(episodes, mean_reward)
@@ -229,22 +264,62 @@ def init_bprogram():
 # plt.xlabel('episode')
 # plt.title(os.path.basename(sys.argv[0])[:-3])
 # plt.savefig(os.path.basename(sys.argv[0])[:-3] + ".pdf")
-# # event_runs = []
-# # for i in range(100):
-# #     reward, event_run = run_optimal(b_program, Q, i)
-# #     if event_run not in event_runs:
-# #         event_runs.append(event_run)
-# # print(event_runs)
+# event_runs = []
+# for i in range(100):
+#     reward, event_run = run_optimal(b_program, Q, i)
+#     if event_run not in event_runs:
+#         event_runs.append(event_run)
+# print(event_runs)
 # import pickle
 # pickle_out = open("Q.pickle", "wb")
 # pickle.dump(Q, pickle_out)
 # pickle_out.close()
-import pickle
-pickle_in = open("Q.pickle", "rb")
-Q = pickle.load(pickle_in)
-pickle_in.close()
+# import pickle
+# pickle_in = open("Q_b.pickle", "rb")
+# Q = pickle.load(pickle_in)
+# pickle_in.close()
+#
+# display = True
+# pygame.init()  # Prepare the PyGame module for use
+# print(Q_test(init_bprogram, Q, 1, 2, 1000))
+# pygame.quit()
 
-display = True
-pygame.init()  # Prepare the PyGame module for use
-print(Q_test_optimal(init_bprogram, Q, 1, 2, 80))
-pygame.quit()
+
+from bp_env import BPEnv
+import random
+from gym import spaces
+from bp_action_space import BPActionSpace
+
+
+def gym_env_generator(episode_timeout):
+    global walls_list, box_list, target_list
+    _ = init_bprogram()
+    env = BPEnv()
+    env.set_bprogram_generator(init_bprogram)
+    action_mapper = {0: "Up", 1: "Down", 2: "Left", 3: "Right"}
+    env.action_mapper = action_mapper
+    env.action_space = spaces.Discrete(action_mapper.__len__())
+    env.observation_space = spaces.MultiDiscrete([max(len(map), len(map[0])) for _ in 2*box_list + 2*[0]])
+    env.episode_timeout = episode_timeout
+    return env
+
+
+# display = True
+# from bp_env import BPEnv
+# import random
+# from gym import spaces
+#
+#
+# env = gym_env_generator(episode_timeout=300)
+# observation = env.reset()
+# reward_sum = 0
+# while True:
+#     # env.render()
+#     action = env.action_space.sample()
+#     observation, reward, done, info = env.step(action)
+#     reward_sum += reward
+#     print(action, observation, reward, done, info)
+#     if done:
+#         break
+# print(reward_sum)
+# env.close()
