@@ -55,7 +55,7 @@ class BPEnv(gym.Env):
         self.steps_counter = 0
         self.last_event = None
         self.bprogram = self.bprogram_generator()
-        self.action_space.bprogram = self.bprogram
+        #self.action_space.bprogram = self.bprogram
         self.bprogram.setup()
         if self.observation_space:
             state = self.state_to_gym_space()

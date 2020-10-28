@@ -1,13 +1,16 @@
 from bppy import *
 import itertools
 from q_learning import *
-import matplotlib.pyplot as plt
 import pygame
 import time
+from bp_env import BPEnv
 
 
 must_finish = "must_finish"
 state = "state"
+pygame_settings = {
+    "display": False
+}
 
 
 def action_to_new_location(action, i, j):
@@ -111,7 +114,7 @@ def box(i, j):
 
 @b_thread
 def map_printer(map):
-    if display:
+    if pygame_settings["display"]:
 
         main_surface = pygame.display.set_mode((32 * len(map[0]), 32 * len(map)))
         count = 0
@@ -163,7 +166,6 @@ def find(map, ch):
 walls_list = []
 box_list = []
 target_list = []
-display = False
 
 # map = [
 #     "  XXXXX ",
@@ -177,14 +179,14 @@ display = False
 # ]
 #
 # Q_a
-map = [
-    "XXXXXXXXX",
-    "Xa      X",
-    "X  b X  X",
-    "X  XXX  X",
-    "X      tX",
-    "XXXXXXXXX"
-       ]
+# map = [
+#     "XXXXXXXXX",
+#     "Xa      X",
+#     "X  b X  X",
+#     "X  XXX  X",
+#     "X      tX",
+#     "XXXXXXXXX"
+#        ]
 
 # map = [
 #     "XXXXXXXXXX",
@@ -210,17 +212,17 @@ map = [
 #     "XXXXX    ",
 # ]
 # Q_b
-# map = [
-#     " XXXXX   ",
-#     " X   XXXX",
-#     " X   X  X",
-#     " XX    tX",
-#     "XXX XXX X",
-#     "X   X X X",
-#     "X  bX XXX",
-#     "Xa  X    ",
-#     "XXXXX    ",
-# ]
+map = [
+    " XXXXX   ",
+    " X   XXXX",
+    " X   X  X",
+    " XX    tX",
+    "XXX XXX X",
+    "X   X X X",
+    "X  bX XXX",
+    "Xa  X    ",
+    "XXXXX    ",
+]
 
 
 map_dict = {
@@ -248,43 +250,6 @@ def init_bprogram():
     return BProgram(bthreads=bthreads_list, event_selection_strategy=SimpleEventSelectionStrategy())
 
 
-
-
-
-# Q, results, episodes, mean_reward = qlearning(bprogram_generator=init_bprogram,
-#                                               num_episodes=1000000,
-#                                               episode_timeout=300,
-#                                               alpha=0.1,
-#                                               gamma=0.99,
-#                                               testing=True,`
-#                                               seed=1,
-#                                               glie=glie_10)
-# plt.plot(episodes, mean_reward)
-# plt.ylabel('mean reward')
-# plt.xlabel('episode')
-# plt.title(os.path.basename(sys.argv[0])[:-3])
-# plt.savefig(os.path.basename(sys.argv[0])[:-3] + ".pdf")
-# event_runs = []
-# for i in range(100):
-#     reward, event_run = run_optimal(b_program, Q, i)
-#     if event_run not in event_runs:
-#         event_runs.append(event_run)
-# print(event_runs)
-# import pickle
-# pickle_out = open("Q.pickle", "wb")
-# pickle.dump(Q, pickle_out)
-# pickle_out.close()
-# import pickle
-# pickle_in = open("Q_b.pickle", "rb")
-# Q = pickle.load(pickle_in)
-# pickle_in.close()
-#
-# display = True
-# pygame.init()  # Prepare the PyGame module for use
-# print(Q_test(init_bprogram, Q, 1, 2, 1000))
-# pygame.quit()
-
-
 from bp_env import BPEnv
 import random
 from gym import spaces
@@ -303,23 +268,3 @@ def gym_env_generator(episode_timeout):
     env.episode_timeout = episode_timeout
     return env
 
-
-# display = True
-# from bp_env import BPEnv
-# import random
-# from gym import spaces
-#
-#
-# env = gym_env_generator(episode_timeout=300)
-# observation = env.reset()
-# reward_sum = 0
-# while True:
-#     # env.render()
-#     action = env.action_space.sample()
-#     observation, reward, done, info = env.step(action)
-#     reward_sum += reward
-#     print(action, observation, reward, done, info)
-#     if done:
-#         break
-# print(reward_sum)
-# env.close()
