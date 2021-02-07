@@ -4,6 +4,7 @@ from q_learning import *
 import pygame
 import time
 from bp_env import BPEnv
+from bp_env_goal import BPGoalEnv
 
 
 must_finish = "must_finish"
@@ -223,6 +224,17 @@ map = [
     "Xa  X    ",
     "XXXXX    ",
 ]
+# Q_c
+# map = [
+#     "XXXXXXXX",
+#     "X   XXXX",
+#     "XbX XXXX",
+#     "X      X",
+#     "X  b b X",
+#     "X b X XX",
+#     "XXX   XX",
+#     "XXXXXXXX",
+# ]
 
 
 map_dict = {
@@ -265,6 +277,22 @@ def gym_env_generator(episode_timeout):
     env.action_mapper = action_mapper
     env.action_space = spaces.Discrete(action_mapper.__len__())
     env.observation_space = spaces.MultiDiscrete([max(len(map), len(map[0])) for _ in 2*box_list + 2*[0]])
+    env.episode_timeout = episode_timeout
+    return env
+
+def gym_goal_env_generator(episode_timeout):
+    global walls_list, box_list, target_list
+    _ = init_bprogram()
+    env = BPGoalEnv()
+    env.set_bprogram_generator(init_bprogram)
+    action_mapper = {0: "Up", 1: "Down", 2: "Left", 3: "Right"}
+    env.action_mapper = action_mapper
+    env.action_space = spaces.Discrete(action_mapper.__len__())
+    env.observation_space = spaces.Dict({
+                'observation': spaces.MultiDiscrete([max(len(map), len(map[0])) for _ in 2*box_list + 2*[0]]),
+                'achieved_goal': spaces.MultiDiscrete([max(len(map), len(map[0])) for _ in 2*box_list + 2*[0]]),
+                'desired_goal': spaces.MultiDiscrete([max(len(map), len(map[0])) for _ in 2*box_list + 2*[0]])
+            })
     env.episode_timeout = episode_timeout
     return env
 

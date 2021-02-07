@@ -30,6 +30,6 @@ for i in range(100):
         event_runs.append(event_run)
 print(event_runs)
 import pickle
-pickle_out = open("Q_b.pickle", "wb")
+pickle_out = open("Q_c.pickle", "wb")
 pickle.dump(Q, pickle_out)
 pickle_out.close()

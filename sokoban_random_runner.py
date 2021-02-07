@@ -1,13 +1,7 @@
-from sokoban import gym_env_generator
+from sokoban import *
 
-
-display = True
-from bp_env import BPEnv
-import random
-from gym import spaces
-
-
-env = gym_env_generator(episode_timeout=20)
+pygame_settings["display"] = True
+env = gym_goal_env_generator(episode_timeout=10)
 observation = env.reset()
 reward_sum = 0
 while True:
@@ -15,8 +9,10 @@ while True:
     action = env.action_space.sample()
     observation, reward, done, info = env.step(action)
     reward_sum += reward
-    print(action, observation, reward, done, info)
+    #print(action, observation, reward, done, info)
+    print(reward, env.compute_reward(observation["achieved_goal"], observation["desired_goal"], None))
     if done:
         break
 print(reward_sum)
 env.close()
+

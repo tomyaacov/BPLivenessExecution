@@ -1,9 +1,10 @@
 import gym
-from gym import error, spaces, utils
+from gym import error, spaces, utils, GoalEnv
 from gym.utils import seeding
 from gym import spaces
 import numpy as np
 from bp_action_space import BPActionSpace
+import random
 
 
 class BPEnv(gym.Env):
@@ -29,24 +30,23 @@ class BPEnv(gym.Env):
             l = self.bprogram.event_selection_strategy.selectable_events(self.bprogram.tickets)
             action_options = [x for x in l if x.name == action_name]
             if len(action_options) == 0:
-                #raise ValueError("Invalid action!!!")
-                reward = self._reward()
+                #reward = self._reward()
+                reward = -1
                 self.steps_counter += 1
-                bprogram_done = self.bprogram.event_selection_strategy.selectable_events(self.bprogram.tickets).__len__() == 0
-                bprogram_done = bprogram_done or self.steps_counter == self.episode_timeout
-                return self.last_state, reward, False, {}
+                return self.last_state, reward, True, {}
             else:
                 action = action_options[0]
 
         self.bprogram.advance_bthreads(action)
         if self.observation_space:
-            new_state = self.state_to_gym_space()
+            new_state = self.state_to_gym_space(False)
         else:
             new_state = "_".join([str(x.get('state', 'D')) for x in self.bprogram.tickets])
         reward = self._reward()
         self.steps_counter += 1
         bprogram_done = self.bprogram.event_selection_strategy.selectable_events(self.bprogram.tickets).__len__() == 0
-        bprogram_done = bprogram_done or self.steps_counter == self.episode_timeout
+        #bprogram_done = bprogram_done or self.steps_counter == self.episode_timeout 
+        bprogram_done = bprogram_done or self.steps_counter == self.episode_timeout or (self.last_state == new_state).all() or reward > 0
         self.last_state = new_state
         #print(new_state)
         return new_state, reward, bprogram_done, {}
@@ -58,7 +58,7 @@ class BPEnv(gym.Env):
         #self.action_space.bprogram = self.bprogram
         self.bprogram.setup()
         if self.observation_space:
-            state = self.state_to_gym_space()
+            state = self.state_to_gym_space(True)
         else:
             state = "_".join([str(x.get('state', 'D')) for x in self.bprogram.tickets])
         self.hot_states = [False] * len(self.bprogram.tickets)
@@ -79,9 +79,13 @@ class BPEnv(gym.Env):
     def must_finish(self):
         return [x.get('must_finish', False) for x in self.bprogram.tickets]
 
-    def state_to_gym_space(self):
+    def state_to_gym_space(self, initial):
         bt_states = [str(x.get('state')) for x in self.bprogram.tickets if 'state' in x]
-        return np.array("_".join(bt_states).split("_")).astype(int)
+        if initial:
+            bt_states.append("1")
+        else:
+            bt_states.append("0")
+        return np.array("_".join(bt_states).split("_")).astype(np.float32)
 
     def _reward(self):
         reward = 0
@@ -92,7 +96,18 @@ class BPEnv(gym.Env):
             if not self.hot_states[j] and new_hot_states[j]:
                 reward += -1
         self.hot_states = new_hot_states
-        if reward == 0 and any(new_hot_states):
-            reward = -0.01
+        # if reward == 0 and any(new_hot_states):
+        #     reward = -0.001
         return reward
-
+    
+    def replace_if_disabled(self, action):
+        action_name = self.action_mapper[action]
+        l = self.bprogram.event_selection_strategy.selectable_events(self.bprogram.tickets)
+        action_options = [x for x in l if x.name == action_name]
+        if len(action_options) == 0:
+            possible_keys = []
+            for n in l:
+                possible_keys.append([k for k,v in self.action_mapper.items() if n.name == v][0])
+            return random.choice(possible_keys)
+        else:
+            return action

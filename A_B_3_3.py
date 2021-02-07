@@ -21,7 +21,7 @@ def add_b():
 def control():
     while True:
         yield {waitFor: BEvent("A"), state: 0, must_finish: False}
-        yield {waitFor: BEvent("B"), block: BEvent("A"), state: 1, must_finish: False}
+        yield {waitFor: All(), block: BEvent("A"), state: 1, must_finish: False}
 
 
 def init_bprogram():
