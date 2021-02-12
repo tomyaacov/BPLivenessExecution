@@ -1,46 +1,25 @@
 from lane_bridge import *
 
-# pygame_settings["display"] = True
-# env = gym_env_generator(episode_timeout=10)
-# observation = env.reset()
-# print(observation)
-# reward_sum = 0
-# while True:
-#     # env.render()
-#     action = env.action_space.sample()
-#     # observation, reward, done, info = env.step(action)
-#     observation, reward, done, info = env.step(1)
-#     reward_sum += reward
-#     print(action, observation, reward, done, info)
-#     if done:
-#         break
-# print(reward_sum)
-# env.close()
+#pygame_settings["display"] = True
+#pygame.init()  
+b_program_settings["n_blue_cars"] = 4
+env = gym_env_generator(episode_timeout=30)
 
-
-if __name__ == "__main__":
-    #pygame_settings["display"] = True
-    pygame.init()  
-    env = gym_env_generator(episode_timeout=15)
-    total_rewards = 0
-    for i in range(1):
-        observation = env.reset()
-        print(observation)
-        reward_sum = 0
-        counter = 0
-        while True:
-            # env.render()
-            observation, reward, done, info = env.step(env.replace_if_disabled(1))
-            # if reward == 1:
-            #     done = True
-            reward_sum += reward
-            counter += 1
-            print(1, observation, reward, done, info)
-            if done:
-                break
-        print(reward_sum)
-        total_rewards += reward_sum
-    print(1+(total_rewards/1000))
-    env.close()
-    pygame.quit()
+total_rewards = 0
+for i in range(10000):
+    observation = env.reset()
+    reward_sum = 0
+    counter = 0
+    while True:
+        # env.render()
+        observation, reward, done, info = env.step(env.replace_if_disabled(random.choice([0,1])))
+        reward_sum += reward
+        counter += 1
+        #print(action, observation, reward, done, info)
+        if done:
+            break
+    total_rewards += reward_sum
+print(1+(total_rewards/10000))
+env.close()
+#pygame.quit()
 

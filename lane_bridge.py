@@ -12,6 +12,10 @@ pygame_settings = {
     "display": False
 }
 
+b_program_settings = {
+    "n_blue_cars": 1
+}
+
 blue_cars_locations = [2.5, 4, 5]
 red_cars_locations = [0]
 
@@ -112,16 +116,30 @@ def road_printer():
         yield {waitFor: All()}
 
 
-def shuffle_locations(n=1):
+def get_random_locations(n):
+    final = []
+    l_bound = 0.5
+    r_bound = 5 - (0.5)*n
+    while len(final) < n:
+        p = round(random.uniform(l_bound, r_bound),1)
+        final.append(p)
+        l_bound = p + 0.5
+        r_bound = r_bound + 0.5
+    return final
+        
+
+def shuffle_locations(n):
     global blue_cars_locations, red_cars_locations
     red_cars_locations = [random.choice([0])]
-    blue_cars_locations = random.sample([0.5,1,1.5,2,2.5,3,3.5,4,4.5,5], n)
+    #blue_cars_locations = random.sample([0.5,1,1.5,2,2.5,3,3.5,4,4.5,5], n)
+    blue_cars_locations = get_random_locations(n)
     #red_cars_locations = [1]
     #blue_cars_locations = [3.5]
-    print(blue_cars_locations)
-    blue_cars_locations.sort()
+    #print(blue_cars_locations)
+    #blue_cars_locations.sort()
 
-def init_bprogram(n=1):
+def init_bprogram():
+    n = b_program_settings["n_blue_cars"]
     shuffle_locations(n)
     bthreads_list = [red_car(0), red_pass_bridge_infinitly_often(0), control_red_crossing(0), road_printer(), blue_cars()]
     return BProgram(bthreads=bthreads_list, event_selection_strategy=SimpleEventSelectionStrategy())
@@ -133,10 +151,11 @@ def gym_env_generator(episode_timeout):
     action_mapper = {0: "Wait", 1: "Move"}
     env.action_mapper = action_mapper
     env.action_space = spaces.Discrete(action_mapper.__len__())
-    env.observation_space = spaces.Box(low=0, high=5, shape=(3,), dtype=np.float32)
+    input_shape = (b_program_settings["n_blue_cars"]+2,)
+    env.observation_space = spaces.Box(low=0, high=5, shape=input_shape, dtype=np.float32)
     env.episode_timeout = episode_timeout
     return env
 
 # pygame_settings["display"] = True
-# bprogram = init_bprogram(2)
+# bprogram = init_bprogram()
 # bprogram.run()
