@@ -46,19 +46,18 @@ def advance_blue_cars():
 def attempting_to_cross(i):
     return red_cars_locations[i] == 1 or red_cars_locations[i] == 2
 
-@b_thread
-def red_car(i):
-    counter = 0
-    while counter < 100:
-        red_state = str(red_cars_locations[i])
-        e = yield {request: [BEvent("Wait"), BEvent("Move")], state: red_state}
-        advance_red_car(i, e)
-        counter +=1
+def red_passed():
+    return red_cars_locations[i] = 4
 
 @b_thread
-def red_pass_bridge_infinitly_often(i):
+def red_car():
+    e = yield {request: [BEvent("Wait"), BEvent("Move")]}
+    advance_red_car(e)
+
+@b_thread
+def red_pass_bridge_infinitly_often():
     while True:
-        while red_cars_locations[i] != 4:
+        while not red_passed():
             yield {waitFor: All(), must_finish: True}
         yield {waitFor: All()}
 
@@ -70,9 +69,16 @@ def blue_cars():
         advance_blue_cars()
 
 @b_thread
-def control_red_crossing(i):
+def blue_car(i):
+    sample_blue_car_location(i)
     while True:
-        if any_blue_on_bridge() and attempting_to_cross(i):
+        yield {waitFor: All()}
+        advance_blue_car(i)
+
+@b_thread
+def control_red_crossing():
+    while True:
+        if any_blue_on_bridge() and attempting_to_cross():
             yield {block: BEvent("Move"), waitFor: All()}
         else:
             yield {waitFor: All()}
@@ -109,7 +115,7 @@ def road_printer():
                     main_surface.blit(red_image, ((i+0.3)  * scale, red_height * scale))
            # Now that everything is drawn, put it on display!
             pygame.display.flip()
-            time.sleep(5)
+            time.sleep(0.5)
             count += 1
             e = yield {waitFor: All()}
     else:
@@ -157,6 +163,5 @@ def gym_env_generator(episode_timeout):
     return env
 
 # pygame_settings["display"] = True
-# b_program_settings["n_blue_cars"] = 3
 # bprogram = init_bprogram()
 # bprogram.run()

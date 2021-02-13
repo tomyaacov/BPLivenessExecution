@@ -38,24 +38,24 @@ experiments = [
         "n": 2,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 250000,
-        "layers": 6
+        "total_timesteps": 300000,
+        "layers": 5
     },
     {
         "name": "dqn3",
         "n": 3,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 400000,
-        "layers": 7
+        "total_timesteps": 500000,
+        "layers": 6
     },
     {
         "name": "dqn4",
         "n": 4,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 550000,
-        "layers": 8
+        "total_timesteps": 700000,
+        "layers": 6
     },
     {
         "name": "ddqn1",
@@ -70,24 +70,24 @@ experiments = [
         "n": 2,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 250000,
-        "layers": 6
+        "total_timesteps": 300000,
+        "layers": 5
     },
     {
         "name": "ddqn3",
         "n": 3,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 400000,
-        "layers": 7
+        "total_timesteps": 500000,
+        "layers": 6
     },
     {
         "name": "ddqn4",
         "n": 4,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 550000,
-        "layers": 8
+        "total_timesteps": 700000,
+        "layers": 6
     },
     {
         "name": "per1",
@@ -102,24 +102,24 @@ experiments = [
         "n": 2,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 250000,
-        "layers": 6
+        "total_timesteps": 300000,
+        "layers": 5
     },
     {
         "name": "per3",
         "n": 3,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 400000,
-        "layers": 7
+        "total_timesteps": 500000,
+        "layers": 6
     },
     {
         "name": "per4",
         "n": 4,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 550000,
-        "layers": 8
+        "total_timesteps": 700000,
+        "layers": 6
     },
 ]
 
