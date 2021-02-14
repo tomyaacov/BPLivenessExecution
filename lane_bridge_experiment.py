@@ -38,7 +38,7 @@ experiments = [
         "n": 2,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 300000,
+        "total_timesteps": 250000,
         "layers": 5
     },
     {
@@ -46,7 +46,7 @@ experiments = [
         "n": 3,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 500000,
+        "total_timesteps": 400000,
         "layers": 6
     },
     {
@@ -54,7 +54,7 @@ experiments = [
         "n": 4,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 700000,
+        "total_timesteps": 600000,
         "layers": 6
     },
     {
@@ -70,7 +70,7 @@ experiments = [
         "n": 2,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 300000,
+        "total_timesteps": 250000,
         "layers": 5
     },
     {
@@ -78,7 +78,7 @@ experiments = [
         "n": 3,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 500000,
+        "total_timesteps": 400000,
         "layers": 6
     },
     {
@@ -86,7 +86,7 @@ experiments = [
         "n": 4,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 700000,
+        "total_timesteps": 600000,
         "layers": 6
     },
     {
@@ -102,7 +102,7 @@ experiments = [
         "n": 2,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 300000,
+        "total_timesteps": 250000,
         "layers": 5
     },
     {
@@ -110,7 +110,7 @@ experiments = [
         "n": 3,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 500000,
+        "total_timesteps": 400000,
         "layers": 6
     },
     {
@@ -118,7 +118,7 @@ experiments = [
         "n": 4,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 700000,
+        "total_timesteps": 600000,
         "layers": 6
     },
 ]
