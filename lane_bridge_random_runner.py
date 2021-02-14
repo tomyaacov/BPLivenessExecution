@@ -2,7 +2,7 @@ from lane_bridge import *
 
 #pygame_settings["display"] = True
 #pygame.init()  
-b_program_settings["n_blue_cars"] = 4
+b_program_settings["n_blue_cars"] = 3
 env = gym_env_generator(episode_timeout=30)
 
 total_rewards = 0
@@ -22,4 +22,4 @@ for i in range(10000):
 print(1+(total_rewards/10000))
 env.close()
 #pygame.quit()
-
+#0.67790.54620.424

@@ -129,7 +129,7 @@ for e in experiments:
     log_dir = "/tmp/"+ e["name"] +"/"
     os.makedirs(log_dir, exist_ok=True)
     b_program_settings["n_blue_cars"] = e["n"]
-    env = gym_env_generator(episode_timeout=50)
+    env = gym_env_generator(episode_timeout=30)
     #env = gym.make('CartPole-v1')
     env = Monitor(env, log_dir)
     policy_kwargs = dict(layers=[e["layers"]])

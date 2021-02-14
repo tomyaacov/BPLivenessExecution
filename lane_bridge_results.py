@@ -28,6 +28,5 @@ for k1,v1 in experiments.items():
     plt.ylabel('mean reward')
     plt.xlabel('episode')
     plt.legend()
-    plt.title(k1)
     plt.savefig(k1 + ".pdf")
     plt.close()
