@@ -2,7 +2,7 @@ from lane_bridge import *
 
 #pygame_settings["display"] = True
 #pygame.init()  
-b_program_settings["n_blue_cars"] = 3
+b_program_settings["n_blue_cars"] = 4
 env = gym_env_generator(episode_timeout=30)
 
 total_rewards = 0

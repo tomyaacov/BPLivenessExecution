@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from numpy.core.fromnumeric import mean
 import numpy as np
 import os
-FOLDER_NAME = "/Users/tomyaacov/Downloads/13_2_9_40"
+FOLDER_NAME = "/Users/tomyaacov/Downloads/14_2_19_18"
 
 experiments = {
     "1_CAR": {"DQN": "dqn1", "DDQN": "ddqn1", "PER": "per1"},
