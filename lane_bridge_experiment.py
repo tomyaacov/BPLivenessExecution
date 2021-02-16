@@ -7,6 +7,7 @@ from stable_baselines.bench import Monitor
 from lane_bridge import *
 
 def evaluate_model(model):
+    env = gym_env_generator(episode_timeout=100)
     total_rewards = 0
     for i in range(1000):
         observation = env.reset()
@@ -30,7 +31,7 @@ experiments = [
         "n": 1,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 100000,
+        "total_timesteps": 300000,
         "layers": 5
     },
     {
@@ -38,7 +39,7 @@ experiments = [
         "n": 2,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 400000,
+        "total_timesteps": 1000000,
         "layers": 5
     },
     {
@@ -46,7 +47,7 @@ experiments = [
         "n": 3,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 700000,
+        "total_timesteps": 3000000,
         "layers": 6
     },
     {
@@ -54,7 +55,7 @@ experiments = [
         "n": 4,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 1000000,
+        "total_timesteps": 10000000,
         "layers": 6
     },
     {
@@ -62,7 +63,7 @@ experiments = [
         "n": 1,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 100000,
+        "total_timesteps": 300000,
         "layers": 5
     },
     {
@@ -70,7 +71,7 @@ experiments = [
         "n": 2,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 400000,
+        "total_timesteps": 1000000,
         "layers": 5
     },
     {
@@ -78,7 +79,7 @@ experiments = [
         "n": 3,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 700000,
+        "total_timesteps": 3000000,
         "layers": 6
     },
     {
@@ -86,7 +87,7 @@ experiments = [
         "n": 4,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 1000000,
+        "total_timesteps": 10000000,
         "layers": 6
     },
     {
@@ -94,7 +95,7 @@ experiments = [
         "n": 1,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 100000,
+        "total_timesteps": 300000,
         "layers": 5
     },
     {
@@ -102,7 +103,7 @@ experiments = [
         "n": 2,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 400000,
+        "total_timesteps": 1000000,
         "layers": 5
     },
     {
@@ -110,7 +111,7 @@ experiments = [
         "n": 3,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 700000,
+        "total_timesteps": 3000000,
         "layers": 6
     },
     {
@@ -118,7 +119,7 @@ experiments = [
         "n": 4,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 1000000,
+        "total_timesteps": 10000000,
         "layers": 6
     },
 ]

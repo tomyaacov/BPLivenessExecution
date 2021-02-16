@@ -109,7 +109,7 @@ def road_printer():
                     main_surface.blit(red_image, ((i+0.3)  * scale, red_height * scale))
            # Now that everything is drawn, put it on display!
             pygame.display.flip()
-            time.sleep(5)
+            time.sleep(0.5)
             count += 1
             e = yield {waitFor: All()}
     else:
@@ -121,8 +121,8 @@ def get_random_locations(n):
     l_bound = 0.5
     r_bound = 5 - (0.5)*n
     while len(final) < n:
-        p = round(random.uniform(l_bound, r_bound) * 2) / 2
-        #p = round(random.uniform(l_bound, r_bound),1)
+        #p = round(random.uniform(l_bound, r_bound) * 2) / 2
+        p = round(random.uniform(l_bound, r_bound),1)
         final.append(p)
         l_bound = p + 0.5
         r_bound = r_bound + 0.5
