@@ -31,96 +31,72 @@ experiments = [
         "n": 1,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 300000,
-        "layers": 5
+        "total_timesteps": 10**5,
+        "layers": [5]
     },
     {
         "name": "dqn2",
         "n": 2,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 1000000,
-        "layers": 5
+        "total_timesteps": 10**6,
+        "layers": [5,5]
     },
     {
         "name": "dqn3",
         "n": 3,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 3000000,
-        "layers": 6
-    },
-    {
-        "name": "dqn4",
-        "n": 4,
-        "double_q": False,
-        "prioritized_replay": False,
-        "total_timesteps": 10000000,
-        "layers": 6
+        "total_timesteps": 10**7,
+        "layers": [7,7]
     },
     {
         "name": "ddqn1",
         "n": 1,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 300000,
-        "layers": 5
+        "total_timesteps": 10**5,
+        "layers": [5]
     },
     {
         "name": "ddqn2",
         "n": 2,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 1000000,
-        "layers": 5
+        "total_timesteps": 10**6,
+        "layers": [5,5]
     },
     {
         "name": "ddqn3",
         "n": 3,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 3000000,
-        "layers": 6
-    },
-    {
-        "name": "ddqn4",
-        "n": 4,
-        "double_q": True,
-        "prioritized_replay": False,
-        "total_timesteps": 10000000,
-        "layers": 6
+        "total_timesteps": 10**7,
+        "layers": [7,7]
     },
     {
         "name": "per1",
         "n": 1,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 300000,
-        "layers": 5
+        "total_timesteps": 10**5,
+        "layers": [5]
     },
     {
         "name": "per2",
         "n": 2,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 1000000,
-        "layers": 5
+        "total_timesteps": 10**6,
+        "layers": [5,5]
     },
     {
         "name": "per3",
         "n": 3,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 3000000,
-        "layers": 6
-    },
-    {
-        "name": "per4",
-        "n": 4,
-        "double_q": False,
-        "prioritized_replay": True,
-        "total_timesteps": 10000000,
-        "layers": 6
+        "total_timesteps": 10**7,
+        "layers": [7,7]
     },
 ]
 
@@ -131,9 +107,8 @@ for e in experiments:
     os.makedirs(log_dir, exist_ok=True)
     b_program_settings["n_blue_cars"] = e["n"]
     env = gym_env_generator(episode_timeout=30)
-    #env = gym.make('CartPole-v1')
     env = Monitor(env, log_dir)
-    policy_kwargs = dict(layers=[e["layers"]])
+    policy_kwargs = dict(layers=e["layers"])
     model = DQN("MlpPolicy", 
                 env, 
                 verbose=1, 
@@ -145,8 +120,8 @@ for e in experiments:
                 double_q = e["double_q"],
                 prioritized_replay = e["prioritized_replay"])
     model.learn(total_timesteps=e["total_timesteps"])
-    model.save(e["name"])
+    model.save(log_dir + e["name"])
     del model # remove to demonstrate saving and loading
-    model = DQN.load(e["name"])
+    model = DQN.load(log_dir + e["name"])
     evaluate_model(model)
     env.close()

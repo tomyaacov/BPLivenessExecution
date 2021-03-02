@@ -31,8 +31,8 @@ for k1,v1 in experiments.items():
         r, s = get_rewards(os.path.join(FOLDER_NAME, v2, "monitor.csv"))
         s = [x/1000 for x in s]
         plt.plot(s, r, label=k2)
-    plt.ylabel('mean reward')
-    plt.xlabel('step (1e3)')
+    plt.ylabel('last 1e3 mean reward')
+    plt.xlabel('events (1e3)')
     plt.legend()
     plt.savefig(k1 + ".pdf")
     plt.close()

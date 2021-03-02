@@ -4,7 +4,7 @@ from q_learning import *
 import pygame
 import time
 from bp_env import BPEnv
-from bp_env_goal import BPGoalEnv
+#from bp_env_goal import BPGoalEnv
 
 
 must_finish = "must_finish"
@@ -12,6 +12,7 @@ state = "state"
 pygame_settings = {
     "display": False
 }
+map_settings = {}
 
 
 def action_to_new_location(action, i, j):
@@ -168,73 +169,6 @@ walls_list = []
 box_list = []
 target_list = []
 
-# map = [
-#     "  XXXXX ",
-#     "XXX   X ",
-#     "X b X XX",
-#     "X X  t X",
-#     "X    X X",
-#     "XX X   X",
-#     " Xa  XXX",
-#     " XXXXX  "
-# ]
-#
-# Q_a
-# map = [
-#     "XXXXXXXXX",
-#     "Xa      X",
-#     "X  b X  X",
-#     "X  XXX  X",
-#     "X      tX",
-#     "XXXXXXXXX"
-#        ]
-
-# map = [
-#     "XXXXXXXXXX",
-#     "X tba b tX",
-#     "XXXXXXXXXX"
-#        ]
-
-#
-# map = [
-#     "XXXXX",
-#     "XabtX",
-#     "XXXXX"
-#        ]
-# map = [
-#     " XXXXX   ",
-#     " X   XXXX",
-#     " X   X  X",
-#     " XX    tX",
-#     "XXX XXXtX",
-#     "X b X XtX",
-#     "X bbX XXX",
-#     "Xa  X    ",
-#     "XXXXX    ",
-# ]
-# Q_b
-map = [
-    " XXXXX   ",
-    " X   XXXX",
-    " X   X  X",
-    " XX    tX",
-    "XXX XXX X",
-    "X   X X X",
-    "X  bX XXX",
-    "Xa  X    ",
-    "XXXXX    ",
-]
-# Q_c
-# map = [
-#     "XXXXXXXX",
-#     "X   XXXX",
-#     "XbX XXXX",
-#     "X      X",
-#     "X  b b X",
-#     "X b X XX",
-#     "XXX   XX",
-#     "XXXXXXXX",
-# ]
 
 
 map_dict = {
@@ -250,6 +184,7 @@ map_dict = {
 
 def init_bprogram():
     global walls_list, box_list, target_list
+    map = map_settings["map"]
     walls_list = find(map, "X")
     box_list = find(map, "b") + find(map, "B")
     empty_target_list = find(map, "t") + find(map, "A")

@@ -6,9 +6,12 @@ from stable_baselines import DQN
 from stable_baselines.bench import Monitor
 from lane_bridge import *
 
+b_program_settings["n_blue_cars"] = 2
+model = DQN.load("models/ddqn2")
+
 def evaluate_model(model):
     total_rewards = 0
-    for i in range(5):
+    for i in range(1000):
         observation = env.reset()
         reward_sum = 0
         counter = 0
@@ -22,10 +25,9 @@ def evaluate_model(model):
             if done:
                 break
         total_rewards += reward_sum
-    print(1+(total_rewards/5))
+    print(1+(total_rewards/1000))
 
-b_program_settings["n_blue_cars"] = 3
-env = gym_env_generator(episode_timeout=100)
+
+env = gym_env_generator(episode_timeout=20)
 pygame_settings["display"] = True
-model = DQN.load("ddqn3")
 evaluate_model(model)
