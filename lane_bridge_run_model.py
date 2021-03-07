@@ -7,7 +7,7 @@ from stable_baselines.bench import Monitor
 from lane_bridge import *
 
 b_program_settings["n_blue_cars"] = 2
-model = DQN.load("models/ddqn2")
+model = DQN.load("models/dqn2")
 
 def evaluate_model(model):
     total_rewards = 0
