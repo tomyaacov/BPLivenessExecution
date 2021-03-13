@@ -31,7 +31,7 @@ experiments = [
         "n": 1,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 3*(10**5),
+        "total_timesteps": 10**5,
         "layers": [5]
     },
     {
@@ -39,7 +39,7 @@ experiments = [
         "n": 2,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 3*(10**6),
+        "total_timesteps": 10**6,
         "layers": [5,5]
     },
     {
@@ -47,7 +47,7 @@ experiments = [
         "n": 3,
         "double_q": False,
         "prioritized_replay": False,
-        "total_timesteps": 3*(10**7),
+        "total_timesteps": 10**7,
         "layers": [7,7]
     },
     {
@@ -55,7 +55,7 @@ experiments = [
         "n": 1,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 3*(10**5),
+        "total_timesteps": 10**5,
         "layers": [5]
     },
     {
@@ -63,7 +63,7 @@ experiments = [
         "n": 2,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 3*(10**6),
+        "total_timesteps": 10**6,
         "layers": [5,5]
     },
     {
@@ -71,7 +71,7 @@ experiments = [
         "n": 3,
         "double_q": True,
         "prioritized_replay": False,
-        "total_timesteps": 3*(10**7),
+        "total_timesteps": 10**7,
         "layers": [7,7]
     },
     {
@@ -79,7 +79,7 @@ experiments = [
         "n": 1,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 3*(10**5),
+        "total_timesteps": 10**5,
         "layers": [5]
     },
     {
@@ -87,7 +87,7 @@ experiments = [
         "n": 2,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 3*(10**6),
+        "total_timesteps": 10**6,
         "layers": [5,5]
     },
     {
@@ -95,7 +95,7 @@ experiments = [
         "n": 3,
         "double_q": False,
         "prioritized_replay": True,
-        "total_timesteps": 3*(10**7),
+        "total_timesteps": 10**7,
         "layers": [7,7]
     },
 ]
