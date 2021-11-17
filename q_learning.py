@@ -63,11 +63,11 @@ def qlearning(environment, num_episodes, alpha, gamma, testing, seed, glie, epis
             timeout = steps_counter == episode_timeout
             done = bprogram_done or timeout
             steps_counter += 1
-        if testing:
-            test_results.append(reward_sum)
-            tested_episodes.append(i)
-            mean_reward.append(sum(test_results[-100:])/len(test_results[-100:]))
-            print(f"Round {i} ended with {mean_reward[-1]} mean reward")
+        #if testing:
+        #    test_results.append(reward_sum)
+        #    tested_episodes.append(i)
+        #    mean_reward.append(sum(test_results[-100:])/len(test_results[-100:]))
+        #    print(f"Round {i} ended with {mean_reward[-1]} mean reward")
     return Q, test_results, tested_episodes, mean_reward
 
 

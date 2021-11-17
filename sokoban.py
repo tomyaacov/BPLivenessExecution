@@ -133,7 +133,7 @@ def map_printer(map):
                     main_surface.blit(map_dict[map[i][j]], (j * 32, i * 32))
             # Now that everything is drawn, put it on display!
             pygame.display.flip()
-            time.sleep(0.5)
+            time.sleep(0.3)
             #print(count)
             count += 1
 

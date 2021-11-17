@@ -45,8 +45,11 @@ class BPEnv(gym.Env):
         reward = self._reward()
         self.steps_counter += 1
         bprogram_done = self.bprogram.event_selection_strategy.selectable_events(self.bprogram.tickets).__len__() == 0
-        #bprogram_done = bprogram_done or self.steps_counter == self.episode_timeout 
-        bprogram_done = bprogram_done or self.steps_counter == self.episode_timeout or (self.last_state == new_state).all() or reward > 0
+        try:
+            #bprogram_done = bprogram_done or self.steps_counter == self.episode_timeout 
+            bprogram_done = bprogram_done or self.steps_counter == self.episode_timeout or (self.last_state == new_state).all() or reward > 0
+        except Exception:
+            bprogram_done = bprogram_done or self.steps_counter == self.episode_timeout 
         self.last_state = new_state
         #print(new_state)
         return new_state, reward, bprogram_done, {}
