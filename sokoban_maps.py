@@ -140,7 +140,16 @@ maps = {
 }
 
 """
-
+[
+        "XXXXXXXX",
+        "X XXX aX",
+        "X t X  X",
+        "X btb  X",
+        "X  b  tX",
+        "XX     X",
+        "XX     X",
+        "XXXXXXXX",
+    ]
 
 XXXXXXXX
 XXX  XXX

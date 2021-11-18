@@ -13,16 +13,7 @@ for map_key, map_value in maps.items():
     env.set_bprogram_generator(init_bprogram)
 
     pygame_settings["display"] = False
-    map_settings["map"] = [
-        "XXXXXXXX",
-        "X XXX aX",
-        "X t X  X",
-        "X btb  X",
-        "X  b  tX",
-        "XX     X",
-        "XX     X",
-        "XXXXXXXX",
-    ]
+    map_settings["map"] = map_value
 
     Q, results, episodes, mean_reward = qlearning(environment=env,
                                                   num_episodes=20000,
@@ -49,7 +40,7 @@ for map_key, map_value in maps.items():
     print(map_key, rewards_sum / 100, end - start)
     #print(event_runs)
     #print(rewards_sum)
-    #import pickle
-    #pickle_out = open("models/Q_f_3.pickle", "wb")
-    #pickle.dump(Q, pickle_out)
-    #pickle_out.close()
+    import pickle
+    pickle_out = open("models/Q_puzzle_"+str(map_key)+".pickle", "wb")
+    pickle.dump(Q, pickle_out)
+    pickle_out.close()
