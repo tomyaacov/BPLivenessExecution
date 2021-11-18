@@ -18,7 +18,7 @@ pygame_settings["display"] = False
 map_settings["map"] = map_value
 
 Q, results, episodes, mean_reward = qlearning(environment=env,
-                                              num_episodes=2,
+                                              num_episodes=20000,
                                               episode_timeout=100,
                                               alpha=0.1,
                                               gamma=0.99,
