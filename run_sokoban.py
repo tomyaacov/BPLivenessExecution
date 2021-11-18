@@ -10,6 +10,7 @@ pickle_in = open("models/Q_f_1.pickle", "rb")
 Q = pickle.load(pickle_in)
 pickle_in.close()
 
+
 pygame_settings["display"] = True
 map_settings["map"] = [
     "XXXXXXXX",
