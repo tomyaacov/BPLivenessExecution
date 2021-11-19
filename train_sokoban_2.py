@@ -9,7 +9,7 @@ import time
 import sys
 map_key = int(sys.argv[1])
 map_value = maps2[map_key]
-for j in range(20):
+for j in range(100):
     start = time.time()
     env = BPEnv()
     env.set_bprogram_generator(init_bprogram)
