@@ -7,8 +7,7 @@ FOLDER_NAME = "/Users/tomyaacov/Downloads/16_2_10_8"
 experiments = {
     "1_CAR": {"DQN": "dqn1", "DDQN": "ddqn1", "PER": "per1"},
     "2_CAR": {"DQN": "dqn2", "DDQN": "ddqn2", "PER": "per2"},
-    "3_CAR": {"DQN": "dqn3", "DDQN": "ddqn3", "PER": "per3"},
-    "4_CAR": {"DQN": "dqn4", "DDQN": "ddqn4", "PER": "per4"}
+    "3_CAR": {"DQN": "dqn3", "DDQN": "ddqn3", "PER": "per3"}
 }
 
 def get_rewards(file):

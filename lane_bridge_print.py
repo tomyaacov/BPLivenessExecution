@@ -46,8 +46,8 @@ def advance_blue_cars():
 def attempting_to_cross(i):
     return red_cars_locations[i] == 1 or red_cars_locations[i] == 2
 
-def red_passed():
-    return red_cars_locations[i] = 4
+def red_passed(i):
+    return red_cars_locations[i] == 4
 
 @b_thread
 def red_car():
@@ -127,7 +127,7 @@ def get_random_locations(n):
     l_bound = 0.5
     r_bound = 5 - (0.5)*n
     while len(final) < n:
-        p = round(random.uniform(l_bound, r_bound),1)
+        p = random.uniform(l_bound, r_bound)
         final.append(p)
         l_bound = p + 0.5
         r_bound = r_bound + 0.5

@@ -121,8 +121,7 @@ def get_random_locations(n):
     l_bound = 0.5
     r_bound = 5 - (0.5)*n
     while len(final) < n:
-        p = round(random.uniform(l_bound, r_bound) * 2) / 2
-        #p = round(random.uniform(l_bound, r_bound),1)
+        p = random.uniform(l_bound, r_bound)
         final.append(p)
         l_bound = p + 0.5
         r_bound = r_bound + 0.5
