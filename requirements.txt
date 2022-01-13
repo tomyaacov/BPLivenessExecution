@@ -23,7 +23,7 @@ numpy==1.19.5
 opencv-python==4.5.1.48
 opt-einsum==3.3.0
 pandas==1.2.1
-Pillow==8.0.1
+Pillow==9.0.0
 protobuf==3.14.0
 pygame==2.0.0.dev12
 pyglet==1.5.0
