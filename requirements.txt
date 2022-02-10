@@ -35,7 +35,7 @@ scipy==1.5.3
 six==1.15.0
 stable-baselines==2.10.1
 tensorboard==1.15.0
-tensorflow==1.15.0
+tensorflow==2.5.3
 tensorflow-estimator==1.15.1
 termcolor==1.1.0
 threadpoolctl==2.1.0
