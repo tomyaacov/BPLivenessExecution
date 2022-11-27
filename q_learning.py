@@ -2,14 +2,15 @@ import random
 
 
 def glie_3(i, num_episodes):
-    if i >= num_episodes-100:
+    if i >= num_episodes - 100:
         return 0
     return 1
 
+
 def glie_10(i, num_episodes):
-    if i >= num_episodes-100:
+    if i >= num_episodes - 100:
         return 0
-    return 1-(i/num_episodes)
+    return 1 - (i / num_episodes)
 
 
 def epsilon_greedy_online(bprogram, Q, s_t, epsilon, reward_sum):
@@ -17,7 +18,7 @@ def epsilon_greedy_online(bprogram, Q, s_t, epsilon, reward_sum):
         if s_t in Q:
             try:
                 return random.choice([key for key in Q[s_t].keys() if Q[s_t][key] == max(Q[s_t].values())])
-                #return random.choice([key for key in Q[s_t].keys() if reward_sum + Q[s_t][key] > -1])
+                # return random.choice([key for key in Q[s_t].keys() if reward_sum + Q[s_t][key] > -1])
             except IndexError:
                 return random.choice(tuple(bprogram.event_selection_strategy.selectable_events(bprogram.tickets)))
         else:
@@ -27,6 +28,7 @@ def epsilon_greedy_online(bprogram, Q, s_t, epsilon, reward_sum):
             return random.choice(tuple(bprogram.event_selection_strategy.selectable_events(bprogram.tickets)))
         except IndexError:
             return None
+
 
 def must_finish(bprogram):
     return [x.get('must_finish', False) for x in bprogram.tickets]
@@ -44,7 +46,8 @@ def qlearning(environment, num_episodes, alpha, gamma, testing, seed, glie, epis
         steps_counter = 0
         reward_sum = 0
         if s_t not in Q:
-            Q[s_t] = {i: 0 for i in environment.bprogram.event_selection_strategy.selectable_events(environment.bprogram.tickets)}
+            Q[s_t] = {i: 0 for i in
+                      environment.bprogram.event_selection_strategy.selectable_events(environment.bprogram.tickets)}
         epsilon = glie(i, num_episodes)
         a_t = epsilon_greedy_online(environment.bprogram, Q, s_t, epsilon, reward_sum)
         while not done:
@@ -55,7 +58,8 @@ def qlearning(environment, num_episodes, alpha, gamma, testing, seed, glie, epis
                 if bprogram_done:
                     Q[s_t_1] = {0: 0}
                 else:
-                    Q[s_t_1] = {i: 0 for i in environment.bprogram.event_selection_strategy.selectable_events(environment.bprogram.tickets)}
+                    Q[s_t_1] = {i: 0 for i in environment.bprogram.event_selection_strategy.selectable_events(
+                        environment.bprogram.tickets)}
 
             Q[s_t][a_t] = Q[s_t][a_t] + alpha * (r_t + gamma * max(Q[s_t_1].values()) - Q[s_t][a_t])
 
@@ -63,11 +67,12 @@ def qlearning(environment, num_episodes, alpha, gamma, testing, seed, glie, epis
             timeout = steps_counter == episode_timeout
             done = bprogram_done or timeout
             steps_counter += 1
-        #if testing:
-        #    test_results.append(reward_sum)
-        #    tested_episodes.append(i)
-        #    mean_reward.append(sum(test_results[-100:])/len(test_results[-100:]))
-        #    print(f"Round {i} ended with {mean_reward[-1]} mean reward")
+        if testing:
+            test_results.append(reward_sum)
+            tested_episodes.append(i)
+            mean_reward.append(sum(test_results[-100:]) / len(test_results[-100:]))
+            if i % 100 == 0:
+                print(f"Round {i} ended with {mean_reward[-1]} mean reward")
     return Q, test_results, tested_episodes, mean_reward
 
 
@@ -84,9 +89,11 @@ def run(environment, Q, seed, episode_timeout, optimal=False):
         try:
             a_t = random.choice(choices)
         except IndexError:
-            a_t = random.choice(tuple(environment.bprogram.event_selection_strategy.selectable_events(environment.bprogram.tickets)))
+            a_t = random.choice(
+                tuple(environment.bprogram.event_selection_strategy.selectable_events(environment.bprogram.tickets)))
     else:
-        a_t = random.choice(tuple(environment.bprogram.event_selection_strategy.selectable_events(environment.bprogram.tickets)))
+        a_t = random.choice(
+            tuple(environment.bprogram.event_selection_strategy.selectable_events(environment.bprogram.tickets)))
     run += a_t.name
     steps_counter = 0
     while True:
@@ -102,9 +109,11 @@ def run(environment, Q, seed, episode_timeout, optimal=False):
             try:
                 a_t_1 = random.choice(choices)
             except IndexError:
-                a_t_1 = random.choice(tuple(environment.bprogram.event_selection_strategy.selectable_events(environment.bprogram.tickets)))
+                a_t_1 = random.choice(tuple(
+                    environment.bprogram.event_selection_strategy.selectable_events(environment.bprogram.tickets)))
         else:
-            a_t_1 = random.choice(tuple(environment.bprogram.event_selection_strategy.selectable_events(environment.bprogram.tickets)))
+            a_t_1 = random.choice(
+                tuple(environment.bprogram.event_selection_strategy.selectable_events(environment.bprogram.tickets)))
         s_t, a_t = s_t_1, a_t_1
         run += a_t.name
         if steps_counter == episode_timeout:
@@ -117,9 +126,8 @@ def Q_test(environment, Q, rounds, seed, episode_timeout, optimal=False):
     total_reward = 0
     success = 0
     for i in range(rounds):
-        r, s = run(environment, Q, seed+i, episode_timeout, optimal)
+        r, s = run(environment, Q, seed + i, episode_timeout, optimal)
         total_reward += r
-        if r==0:
+        if r == 0:
             success += 1
-    print("Average Reward:", total_reward/rounds, "Successful Round pct.", success/rounds)
-
+    print("Average Reward:", total_reward / rounds, "Successful Round pct.", success / rounds)
