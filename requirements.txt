@@ -44,7 +44,7 @@ torch==1.7.1
 torchaudio==0.7.2
 torchvision==0.8.2
 typing-extensions==3.7.4.3
-Werkzeug==1.0.1
+Werkzeug==2.2.3
 wrapt==1.12.1
 z3-solver==4.8.9.0
 zipp==3.4.0
